@@ -31,7 +31,6 @@ public class GameLogic implements PlayableLogic {
                 this.kingPosition=temp.getPosition();
             }
             this.board[a.getX()][a.getY()] = null;
-            System.out.println(temp.toString()+" "+temp.getMoveHistory());
             this.hasCapture(temp);
             this.checkWin(b);
             this.isPlayerTwoTurn = !this.isPlayerTwoTurn;
@@ -160,18 +159,42 @@ public class GameLogic implements PlayableLogic {
        }
     }
     private void printStats (boolean isGameOver){
-        List<ConcretePiece> concretePieces  = new ArrayList<>();
+        List<ConcretePiece> playerOnePieces  = new ArrayList<>();
+        List<ConcretePiece> playerTwoPieces  = new ArrayList<>();
         for (int i=0; i<11; i++){
            for (int j=0;j<11; j++){
                if (this.board[i][j]!=null){
-                   concretePieces.add(this.board[i][j]);
+                   if (this.board[i][j].getOwner().isPlayerOne()){
+                       playerOnePieces.add(this.board[i][j]);
+               }
+                   else {
+                       playerTwoPieces.add(this.board[i][j]);
+                   }
                }
            }
        }
-        ConcretePiece.MoveHistorySizeComparator outerMoveHistorySizeComparator = new ConcretePiece.MoveHistorySizeComparator();
-        concretePieces.sort(outerMoveHistorySizeComparator);
-        for (ConcretePiece piece: concretePieces) {
-            System.out.println(piece.toString() + " " + piece.getMoveHistory());
+        ConcretePiece.MoveHistorySizeComparator innerMoveHistorySizeComparator = new ConcretePiece.MoveHistorySizeComparator();
+        playerOnePieces.sort(innerMoveHistorySizeComparator);
+        playerTwoPieces.sort(innerMoveHistorySizeComparator);
+
+        if (isPlayerOneWin) {
+            for (ConcretePiece piece : playerOnePieces) {
+                System.out.println(piece.toString() + " " + piece.getMoveHistory());
+            }
+            for (ConcretePiece piece : playerTwoPieces) {
+                System.out.println(piece.toString() + " " + piece.getMoveHistory());
+            }
+        }
+        else {
+            for (ConcretePiece piece : playerTwoPieces) {
+                System.out.println(piece.toString() + " " + piece.getMoveHistory());
+            }
+            for (ConcretePiece piece : playerOnePieces) {
+                System.out.println(piece.toString() + " " + piece.getMoveHistory());
+            }
+        }
+        for(int i=0; i<75;i++){
+            System.out.printf("*");
         }
     }
     private boolean isKingSurrounded(Position kingPosition) {
@@ -287,13 +310,7 @@ public class GameLogic implements PlayableLogic {
         // create pawn in the six column and eighth row and define it to be owns by PlayerOne (defender)
         this.board[5][7] = new Pawn(this.playerOne);
         // create King in the middle of the board and define it to be owns by PlayerOne (defender)
-        King king = new King(this.playerOne);
-        this.board[5][5] = king;
-        this.kingPosition = this.board[5][5].getPosition();
-        king.setPosition(new Position(5, 5)); // Set the initial position for the king
-        this.kingPosition = king.getPosition();
-
-
+        this.board[5][5] = new King(this.playerOne);
         //PlayerTwo's Pawns (attacker):
         // create pawns in the first row and define them to be owned by PlayerTwo (attacker)
         for (int i = 3; i <= 7; i++) {
@@ -328,6 +345,7 @@ public class GameLogic implements PlayableLogic {
                 }
             }
         }
+        this.kingPosition=this.board[5][5].getPosition();
 
         // Set the numbers for pieces in the board
         int countPlayerOne = 1;
