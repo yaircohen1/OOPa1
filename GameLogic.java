@@ -10,6 +10,7 @@ public class GameLogic implements PlayableLogic {
     private final ConcretePlayer playerTwo = new ConcretePlayer(false); // playerTwo is attacker
     private boolean gameFinished;
     private boolean isPlayerTwoTurn=true;
+    private boolean isPlayerOneWin;
     private List <ConcretePiece> capturedPieces;
 
 
@@ -30,7 +31,7 @@ public class GameLogic implements PlayableLogic {
                 this.kingPosition=temp.getPosition();
             }
             this.board[a.getX()][a.getY()] = null;
-            System.out.println("king position : "+kingPosition);
+            System.out.println(temp.toString()+" "+temp.getMoveHistory());
             this.hasCapture(temp);
             this.checkWin(b);
             this.isPlayerTwoTurn = !this.isPlayerTwoTurn;
@@ -148,14 +149,31 @@ public class GameLogic implements PlayableLogic {
         if(this.getPieceAtPosition(position) instanceof King && isCorner(position)){
            this.gameFinished = true;
            this.playerOne.winGame();
+           this.isPlayerOneWin=true;
+            printStats(gameFinished);
        }
        if (isKingSurrounded(kingPosition)){
-           System.out.printf("true");
            this.gameFinished = true;
            this.playerTwo.winGame();
+           this.isPlayerOneWin=false;
+           printStats(gameFinished);
        }
     }
-
+    private void printStats (boolean isGameOver){
+        List<ConcretePiece> concretePieces  = new ArrayList<>();
+        for (int i=0; i<11; i++){
+           for (int j=0;j<11; j++){
+               if (this.board[i][j]!=null){
+                   concretePieces.add(this.board[i][j]);
+               }
+           }
+       }
+        ConcretePiece.MoveHistorySizeComparator outerMoveHistorySizeComparator = new ConcretePiece.MoveHistorySizeComparator();
+        concretePieces.sort(outerMoveHistorySizeComparator);
+        for (ConcretePiece piece: concretePieces) {
+            System.out.println(piece.toString() + " " + piece.getMoveHistory());
+        }
+    }
     private boolean isKingSurrounded(Position kingPosition) {
         if(kingPosition!=null){
         int x = kingPosition.getX();
@@ -241,88 +259,94 @@ public class GameLogic implements PlayableLogic {
     public boolean isSecondPlayerTurn() {
         return this.isPlayerTwoTurn;
     }
+    private boolean isPlayerOneWin(){
+        return this.isPlayerOneWin;
+    }
     public void reset() {
-    this.board=new ConcretePiece[11][11];
-    this.gameFinished=false;
-    this.isPlayerTwoTurn = true;
+        this.board = new ConcretePiece[11][11];
+        this.gameFinished = false;
+        this.isPlayerTwoTurn = true;
 
-    //PlayerOne's King and Pawns (defender)
-    // create pawn in the six column and forth row and define it to be owns by PlayerOne (defender)
-        this.board[5][3]= new Pawn(this.playerOne);
-    // create pawns in the fifth row and define them to be owned by PlayerOne (defender)
-        for (int i=4; i<=6; i++) {
+        //PlayerOne's King and Pawns (defender)
+        // create pawn in the six column and forth row and define it to be owns by PlayerOne (defender)
+        this.board[5][3] = new Pawn(this.playerOne);
+        // create pawns in the fifth row and define them to be owned by PlayerOne (defender)
+        for (int i = 4; i <= 6; i++) {
             this.board[i][4] = new Pawn(this.playerOne);
-            }
-    // create pawns in the sixth row and define them to be owned by PlayerOne (defender)
-        for (int i=3; i<=7; i++) {
+        }
+        // create pawns in the sixth row and define them to be owned by PlayerOne (defender)
+        for (int i = 3; i <= 7; i++) {
             if (i != 5) {
                 this.board[i][5] = new Pawn(this.playerOne);
             }
         }
-    // create pawns in the seventh row and define them to be owned by PlayerOne (defender)
-        for (int i=4; i<=6; i++){
-            this.board[i][6]=new Pawn(this.playerOne);
+        // create pawns in the seventh row and define them to be owned by PlayerOne (defender)
+        for (int i = 4; i <= 6; i++) {
+            this.board[i][6] = new Pawn(this.playerOne);
         }
-    // create pawn in the six column and eighth row and define it to be owns by PlayerOne (defender)
-        this.board[5][7]= new Pawn(this.playerOne);
-    // create King in the middle of the board and define it to be owns by PlayerOne (defender)
+        // create pawn in the six column and eighth row and define it to be owns by PlayerOne (defender)
+        this.board[5][7] = new Pawn(this.playerOne);
+        // create King in the middle of the board and define it to be owns by PlayerOne (defender)
         King king = new King(this.playerOne);
-        this.board[5][5]= king;
+        this.board[5][5] = king;
         this.kingPosition = this.board[5][5].getPosition();
         king.setPosition(new Position(5, 5)); // Set the initial position for the king
         this.kingPosition = king.getPosition();
 
 
-    //PlayerTwo's Pawns (attacker):
-    // create pawns in the first row and define them to be owned by PlayerTwo (attacker)
-        for (int i=3; i<=7; i++){
-            this.board[i][0]=new Pawn(this.playerTwo);
+        //PlayerTwo's Pawns (attacker):
+        // create pawns in the first row and define them to be owned by PlayerTwo (attacker)
+        for (int i = 3; i <= 7; i++) {
+            this.board[i][0] = new Pawn(this.playerTwo);
         }
-    // create pawn in the second row and define it to be owned by PlayerTwo (attacker)
-        this.board[5][1]=new Pawn(this.playerTwo);
-    // create pawns in the first column and define them to be owned by PlayerTwo (attacker)
-        for (int i=3; i<=7;i++){
-        this.board[0][i]=new Pawn(this.playerTwo);
+        // create pawn in the second row and define it to be owned by PlayerTwo (attacker)
+        this.board[5][1] = new Pawn(this.playerTwo);
+        // create pawns in the first column and define them to be owned by PlayerTwo (attacker)
+        for (int i = 3; i <= 7; i++) {
+            this.board[0][i] = new Pawn(this.playerTwo);
         }
-    // create pawn in the second column and define it to be owned by PlayerTwo (attacker)
-        this.board[1][5]=new Pawn(this.playerTwo);
-    // create pawn in the tenth column and define it to be owned by PlayerTwo (attacker)
-        this.board[9][5]=new Pawn(this.playerTwo);
-    //create pawns in the last column and define them to be owned by PlayerTwo (attacker)
-        for (int i=3; i<=7;i++) {
+        // create pawn in the second column and define it to be owned by PlayerTwo (attacker)
+        this.board[1][5] = new Pawn(this.playerTwo);
+        // create pawn in the tenth column and define it to be owned by PlayerTwo (attacker)
+        this.board[9][5] = new Pawn(this.playerTwo);
+        //create pawns in the last column and define them to be owned by PlayerTwo (attacker)
+        for (int i = 3; i <= 7; i++) {
             this.board[10][i] = new Pawn(this.playerTwo);
         }
-    // create pawn in the tenth row and define it to be owned by PlayerTwo (attacker)
-        this.board[5][9]=new Pawn(this.playerTwo);
-    // Create pawns in the first row and define them to be owned by PlayerTwo (attacker)
-        for (int i=3; i<=7; i++){
-            this.board[i][10]=new Pawn(this.playerTwo);
+        // create pawn in the tenth row and define it to be owned by PlayerTwo (attacker)
+        this.board[5][9] = new Pawn(this.playerTwo);
+        // Create pawns in the first row and define them to be owned by PlayerTwo (attacker)
+        for (int i = 3; i <= 7; i++) {
+            this.board[i][10] = new Pawn(this.playerTwo);
         }
-    // Set the numbers for pieces in the board
-        int countPlayerOne=1;
-        int countPlayerTwo=1;
-        for(int i=0; i<=10; i++)
-        {
-            for(int j=0; j<=10; j++)
-            {
-                  if (this.board[i][j]!=null)
-                  {
-                      ConcretePiece piece = this.board[i][j];
-                      if (piece.getOwner().isPlayerOne())
-                      {
-                          piece.setNumConcretePiece(countPlayerOne);
-                          countPlayerOne++;
-                      }
-                      else
-                      {
-                          piece.setNumConcretePiece(countPlayerTwo);
-                          countPlayerTwo++;
-                      }
-                  }
+        // set positions for all pieces
+        for (int i = 0; i <= 10; i++) {
+            for (int j = 0; j <= 10; j++) {
+                if (this.board[i][j] != null) {
+                    ConcretePiece piece = this.board[i][j];
+                    piece.setPosition(new Position(i, j));
+                }
+            }
+        }
+
+        // Set the numbers for pieces in the board
+        int countPlayerOne = 1;
+        int countPlayerTwo = 1;
+        for (int i = 0; i <= 10; i++) {
+            for (int j = 0; j <= 10; j++) {
+                if (this.board[j][i] != null) {
+                    ConcretePiece piece = this.board[j][i];
+                    if (piece.getOwner().isPlayerOne()) {
+                        piece.setNumConcretePiece(countPlayerOne);
+                        countPlayerOne++;
+                    } else {
+                        piece.setNumConcretePiece(countPlayerTwo);
+                        countPlayerTwo++;
+                    }
+                }
             }
         }
     }
-
     @Override
     public void undoLastMove() {
     }
