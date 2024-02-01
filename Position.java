@@ -1,14 +1,15 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Position {
     private int x;
     private int y;
-    private final List<Piece> pieces;
+    private final List<Piece> diffPieces;
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
-        this.pieces = new LinkedList();
+        this.diffPieces = new ArrayList<>();
     }
 
     // Getter methods for x and y coordinates
@@ -18,10 +19,6 @@ public class Position {
 
     public int getY() {
         return this.y;
-    }
-
-    public void raisePiece(Piece piece) {
-        this.pieces.add(piece);
     }
 
 public String toString() {
