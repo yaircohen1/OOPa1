@@ -12,7 +12,6 @@ public abstract class ConcretePiece implements Piece {
     // Constructor
     public ConcretePiece() {
     }
-
     public Player getOwner() {
         return this.owner;
     }
@@ -32,6 +31,7 @@ public abstract class ConcretePiece implements Piece {
     public void setPosition(Position position) {
         this.moveHistory.add(position);
         this.position = position;
+
     }
 
     public Position getPosition() {
@@ -56,10 +56,6 @@ public abstract class ConcretePiece implements Piece {
             distance += Math.sqrt(squaredDistance);
         }
         return this.distance=distance;
-    }
-
-    public String getDistanceStr() {
-        return this.distance + " squares";
     }
 
     public static Comparator<ConcretePiece> MoveHistorySizeComparator = Comparator.comparingInt(ConcretePiece::getMoveHistorySize);

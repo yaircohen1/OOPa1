@@ -14,9 +14,9 @@ public class GameLogic implements PlayableLogic {
     private boolean isPlayerOneWin;
     private List <ConcretePiece> capturedPieces;
 
+
     // Constructor
     public GameLogic() {
-        this.positions = new Position[11][11];
         this.capturedPieces = new ArrayList<>();
         this.reset();
 
@@ -29,6 +29,11 @@ public class GameLogic implements PlayableLogic {
             if(temp instanceof King) {
                 this.kingPosition=temp.getPosition();
             }
+            if (this.positions[b.getX()][b.getY()] == null) {
+                Position position = new Position(b.getX(),b.getY());
+                this.positions[b.getX()][b.getY()] = position;
+            }
+            this.positions[b.getX()][b.getY()].addPiece(this.board[b.getX()][b.getY()]);
             this.board[a.getX()][a.getY()] = null;
             this.hasCapture(temp);
             this.checkWin(b);
@@ -37,7 +42,6 @@ public class GameLogic implements PlayableLogic {
 
         }
          return false;
-
     }
 
     private boolean isLegalMove(Position current, Position destination) {
@@ -162,6 +166,8 @@ public class GameLogic implements PlayableLogic {
         List<ConcretePiece> playerTwoPieces = new ArrayList<>();
         List<Pawn> pawns = new ArrayList<>();
         List<ConcretePiece> Q3Pieces = new ArrayList<>();
+        List<Position> Q4Positions = new ArrayList<>();
+
         /////  Q1
         for (int i = 0; i < 11; i++) {
             for (int j = 0; j < 11; j++) {
@@ -202,7 +208,8 @@ public class GameLogic implements PlayableLogic {
             System.out.printf("*");
         }
         System.out.println(" ");
-/////  Q2
+
+        /////  Q2
         for (int i = 0; i < capturedPieces.size(); i++) {
             ConcretePiece capturedPiece = capturedPieces.get(i);
             if (capturedPiece instanceof Pawn) {
@@ -225,10 +232,10 @@ public class GameLogic implements PlayableLogic {
         }
         System.out.println(" ");
 
-        ///Q3
+        /////  Q3
         for (int i = 0; i < capturedPieces.size(); i++) {
-                Q3Pieces.add(capturedPieces.get(i));
-            }
+            Q3Pieces.add(capturedPieces.get(i));
+        }
         if (isPlayerOneWin) {
             Q3Pieces.sort(new ConcretePiece.distanceComparator(playerOne));
         } else Q3Pieces.sort(new ConcretePiece.distanceComparator(playerTwo));
@@ -243,9 +250,24 @@ public class GameLogic implements PlayableLogic {
         }
         System.out.println(" ");
 
+        /////  Q4
+        for (int i = 0; i < 11; i++) {
+            for (int j = 0; j < 11; j++) {
+                if (this.positions[i][j] != null) {
+                    Q4Positions.add(this.positions[i][j]);
+                }
+            }
         }
-
-
+            Q4Positions.sort(new Position.positionsComparator());
+            for (Position position : Q4Positions) {
+                if (position.getPieceSize() > 1) {
+                    System.out.println(position.toString() + ": " + position.getPieceSize() + " pieces");
+                }
+            }
+            for (int i = 0; i < 75; i++) {
+                System.out.printf("*");
+            }
+    }
     private boolean isKingSurrounded(Position kingPosition) {
         if(kingPosition!=null){
         int x = kingPosition.getX();
@@ -336,6 +358,7 @@ public class GameLogic implements PlayableLogic {
     }
     public void reset() {
         this.board = new ConcretePiece[11][11];
+        this.positions=new Position[11][11];
         this.gameFinished = false;
         this.isPlayerTwoTurn = true;
 
@@ -391,6 +414,9 @@ public class GameLogic implements PlayableLogic {
                 if (this.board[i][j] != null) {
                     ConcretePiece piece = this.board[i][j];
                     piece.setPosition(new Position(i, j));
+                    this.positions[i][j] = new Position(i, j);
+                    this.positions[i][j].addPiece(this.board[i][j]);
+                    // this.positions[j][i].addPiece(piece);
                 }
             }
         }
@@ -410,10 +436,13 @@ public class GameLogic implements PlayableLogic {
                         piece.setNumConcretePiece(countPlayerTwo);
                         countPlayerTwo++;
                     }
+
+
                 }
             }
         }
     }
+
     @Override
     public void undoLastMove() {
     }
