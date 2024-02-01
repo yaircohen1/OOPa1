@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,17 +14,15 @@ public class GameLogic implements PlayableLogic {
     private boolean isPlayerOneWin;
     private List <ConcretePiece> capturedPieces;
 
-
-
     // Constructor
-
     public GameLogic() {
         this.positions = new Position[11][11];
+        this.capturedPieces = new ArrayList<>();
         this.reset();
     }
     public boolean move(Position a, Position b) {
         if (isLegalMove(a, b)) {
-            this.capturedPieces = new ArrayList<>();
+
             ConcretePiece temp = this.board[a.getX()][a.getY()];
             this.board[b.getX()][b.getY()] = temp;
             temp.setPosition(b);
@@ -161,6 +160,7 @@ public class GameLogic implements PlayableLogic {
     private void printStats (boolean isGameOver){
         List<ConcretePiece> playerOnePieces  = new ArrayList<>();
         List<ConcretePiece> playerTwoPieces  = new ArrayList<>();
+    /////  Q1
         for (int i=0; i<11; i++){
            for (int j=0;j<11; j++){
                if (this.board[i][j]!=null){
@@ -173,30 +173,65 @@ public class GameLogic implements PlayableLogic {
                }
            }
        }
+
         ConcretePiece.MoveHistorySizeComparator innerMoveHistorySizeComparator = new ConcretePiece.MoveHistorySizeComparator();
         playerOnePieces.sort(innerMoveHistorySizeComparator);
         playerTwoPieces.sort(innerMoveHistorySizeComparator);
 
         if (isPlayerOneWin) {
             for (ConcretePiece piece : playerOnePieces) {
-                System.out.println(piece.toString() + " " + piece.getMoveHistory());
+                System.out.println(piece.toString() + piece.getMoveHistory());
             }
             for (ConcretePiece piece : playerTwoPieces) {
-                System.out.println(piece.toString() + " " + piece.getMoveHistory());
+                System.out.println(piece.toString()  + piece.getMoveHistory());
             }
         }
         else {
             for (ConcretePiece piece : playerTwoPieces) {
-                System.out.println(piece.toString() + " " + piece.getMoveHistory());
+                System.out.println(piece.toString() + piece.getMoveHistory());
             }
             for (ConcretePiece piece : playerOnePieces) {
-                System.out.println(piece.toString() + " " + piece.getMoveHistory());
+                System.out.println(piece.toString() + piece.getMoveHistory());
             }
         }
         for(int i=0; i<75;i++){
             System.out.printf("*");
         }
-    }
+        System.out.println(" ");
+/////  Q2
+        List<Pawn> pawns = new ArrayList<>();
+        for (int i=0; i<11; i++){
+            for (int j=0;j<11; j++){
+                    if(this.board[i][j] instanceof Pawn) {
+                        pawns.add(((Pawn) this.board[i][j]));
+                    }
+            }
+        }
+        for (int i=0; i<capturedPieces.size();i++) {
+            ConcretePiece capturedPiece = capturedPieces.get(i);
+            if (capturedPiece instanceof Pawn) {
+                pawns.add((Pawn) capturedPiece);
+            }
+        }
+
+        if(isPlayerOneWin) {
+            pawns.sort(new Pawn.KillsComparator(playerOne));
+        }
+        else pawns.sort(new Pawn.KillsComparator(playerTwo));
+
+        Pawn p;
+        for(Pawn pawn : pawns) {
+            if (pawn.getKills() > 0){
+                System.out.println(pawn.toString() + ": " + pawn.getKills() + " kills");
+            }
+        }
+        for(int i=0; i<75;i++){
+            System.out.printf("*");
+        }
+        System.out.println(" ");
+        }
+
+
     private boolean isKingSurrounded(Position kingPosition) {
         if(kingPosition!=null){
         int x = kingPosition.getX();
@@ -345,7 +380,7 @@ public class GameLogic implements PlayableLogic {
                 }
             }
         }
-        this.kingPosition=this.board[5][5].getPosition();
+        this.kingPosition = this.board[5][5].getPosition();
 
         // Set the numbers for pieces in the board
         int countPlayerOne = 1;
