@@ -265,7 +265,7 @@ public class GameLogic implements PlayableLogic {
             Q4Positions.sort(new Position.positionsComparator());
             for (Position position : Q4Positions) {
                 if (position.getPieceSize() > 1) {
-                    System.out.println(position.toString() + ": " + position.getPieceSize() + " pieces");
+                    System.out.println(position.toString() + position.getPieceSize() + " pieces");
                 }
             }
             for (int i = 0; i < 75; i++) {

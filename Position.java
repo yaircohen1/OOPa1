@@ -34,7 +34,7 @@ public class Position {
     }
 
     public String toString() {
-        return "("+this.x+","+this.y+")";
+        return "("+this.x+", "+this.y+")";
     }
     public static Comparator<Position> positionsComparator = Comparator.comparingInt(Position::getPieceSize);
     static class positionsComparator implements Comparator<Position> {
