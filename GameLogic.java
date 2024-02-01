@@ -191,17 +191,21 @@ public class GameLogic implements PlayableLogic {
 
         if (isPlayerOneWin) {
             for (ConcretePiece piece : playerOnePieces) {
-                System.out.println(piece.toString() + piece.getMoveHistory());
+                if(piece.getMoveHistory().size()>1)
+                    System.out.println(piece.toString() + piece.getMoveHistory());
             }
             for (ConcretePiece piece : playerTwoPieces) {
-                System.out.println(piece.toString() + piece.getMoveHistory());
+                if(piece.getMoveHistory().size()>1)
+                    System.out.println(piece.toString() + piece.getMoveHistory());
             }
         } else {
             for (ConcretePiece piece : playerTwoPieces) {
-                System.out.println(piece.toString() + piece.getMoveHistory());
+                if(piece.getMoveHistory().size()>1)
+                    System.out.println(piece.toString() + piece.getMoveHistory());
             }
             for (ConcretePiece piece : playerOnePieces) {
-                System.out.println(piece.toString() + piece.getMoveHistory());
+                if(piece.getMoveHistory().size()>1)
+                    System.out.println(piece.toString() + piece.getMoveHistory());
             }
         }
         for (int i = 0; i < 75; i++) {
